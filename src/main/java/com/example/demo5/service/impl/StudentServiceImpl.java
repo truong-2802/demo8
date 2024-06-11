@@ -8,14 +8,14 @@ import com.example.demo5.repository.StudentRepository;
 import com.example.demo5.repository.StudentRepositoryReflect;
 import com.example.demo5.repository.impl.StudentRepositoryImpl;
 import com.example.demo5.service.StudentService;
-import org.springframework.util.CollectionUtils;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+@Service
 
 public class StudentServiceImpl implements StudentService {
 
@@ -23,87 +23,32 @@ public class StudentServiceImpl implements StudentService {
     StudentMapper studentMapper = new StudentMapperImpl();
     StudentRepositoryReflect studentRepository1 = new StudentRepositoryReflect(Student.class);
 
-
-
+    @Override
     public List<StudentDto> findAll() {
         List<Student> students = studentRepository1.findAll();
-//        // mapping list entity -> dto
-//        List<StudentDto> studentDtos = new ArrayList<>();
-//        for(Student s : students){
-//            StudentDto dto  = studentMapper.entityToDto(s);
-//            studentDtos.add(dto);
-//        }
-//        return studentDtos;
-        // lambda function
         return students.stream()
                 .map(studentMapper::entityToDto)
                 .collect(Collectors.toList());
     }
-    public static void main(String[] args) {
-        List<String> strs = Arrays.asList("sfdsfd","sfsfsd","sgsdgdsg");
-//        for(String s : strs){
-//            System.err.println(s);
-//        }
-        // -> lambda
-        strs.forEach(System.err::println);
-
-
-        List<Student> students = new ArrayList<>();
-        // get all name of student -> to list <String>
-
-        List<String> strName = new ArrayList<>();
-        for (Student s : students){
-            strName.add(s.getFirstName());
-        }
-        List<String> strName1 = students.stream().map(Student::getFirstName).collect(Collectors.toList());
-
-
-
-
-
-    }
-
-
-//    @Override
-//    public StudentDto getById(Long id) {
-//        Optional<List<Student>> optionalStudents = studentRepository.getById(String.valueOf(id));
-//        if (optionalStudents.isPresent()) {
-//            List<Student> students = optionalStudents.get();
-//            if (!CollectionUtils.isEmpty(students)) {
-//                return studentMapper.entityToDto(students.get(0));
-//            }
-//        }
-//        return null;
-//    }
-
-
 
     @Override
     public StudentDto getStudentById(Long id) {
         Optional<List<Student>> optionalStudents = studentRepository.getById(String.valueOf(id));
-        if (optionalStudents.isPresent()) {
-            List<Student> students = optionalStudents.get();
-            if (!CollectionUtils.isEmpty(students)) {
+        return optionalStudents.map(students -> {
+            if (!students.isEmpty()) {
                 return studentMapper.entityToDto(students.get(0));
             }
-        }
-        return null;
-
+            return null;
+        }).orElse(null);
     }
-
 
     @Override
     public List<StudentDto> getByFirstName(String firstName) {
         Optional<List<Student>> optionalStudents = studentRepository.getByFirstName(firstName);
-        if (optionalStudents.isPresent()) {
-            List<Student> students = optionalStudents.get();
-            if (!CollectionUtils.isEmpty(students)) {
-                return students.stream()
+        return optionalStudents.map(students -> students.stream()
                         .map(studentMapper::entityToDto)
-                        .collect(Collectors.toList());
-            }
-        }
-        return null;
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
     }
 
     @Override
@@ -118,5 +63,23 @@ public class StudentServiceImpl implements StudentService {
         studentRepository.save(student);
         return "Success";
     }
-}
 
+    @Override
+    public void updateStudent(Long id, StudentDto studentDto) {
+        Optional<List<Student>> optionalStudents = studentRepository.getById(String.valueOf(id));
+        optionalStudents.ifPresent(students -> {
+            if (!students.isEmpty()) {
+                Student existingStudent = students.get(0);
+                studentMapper.updateStudentFromDto(existingStudent, studentDto);
+                studentRepository.save(existingStudent);
+            }
+        });
+    }
+
+    @Override
+    public String deleteStudent(Long id) {
+        studentRepository.deleteById(id);
+        return "Student deleted successfully";
+    }
+
+}

@@ -55,10 +55,10 @@ public abstract class JpaExecutorImpl<T> implements JpaExecutor<T> {
             throw new RuntimeException(e);
         }
     }
-    @Override
-    public Optional<T> findById(Number id){
-        return Optional.empty();
-    }
+//    @Override
+//    public Optional<T> findById(Number id){
+//        return Optional.empty();
+//    }
     @Override
     public Optional<T> findByFirstName(String first_name){
         return Optional.empty();

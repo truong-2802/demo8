@@ -10,35 +10,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/api/v1")
 public class StudentController {
-    StudentService studentService = new StudentServiceImpl();
-    // api/v1/student/1  .. and httpMethod  = GET
-//    @GetMapping("/student/{id}")
-//    public ResponseEntity<StudentDto> getStudentById(@PathVariable Long id) {
-//        StudentDto studentDto = studentService.getStudentById(id);
-//        if (studentDto != null) {
-//            return ResponseEntity.ok(studentDto);
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-    @GetMapping(value = "/student/{studentId}")
-    public StudentDto get(@PathVariable Long studentId){
+    @Autowired
+    private StudentService studentService;
+
+    @GetMapping("/student/{studentId}")
+    public StudentDto getStudentById(@PathVariable Long studentId) {
         return studentService.getStudentById(studentId);
     }
-    @GetMapping(value = "/student")
-    public List<StudentDto> finadall(){
+
+    @GetMapping("/student")
+    public List<StudentDto> findAllStudents() {
         return studentService.findAll();
     }
-    @GetMapping(value = "/student/search")
-    public List<StudentDto> getByFirstName(@RequestParam("firstName") String firstName){
+
+    @GetMapping("/student/search")
+    public List<StudentDto> getByFirstName(@RequestParam("firstName") String firstName) {
         return studentService.getByFirstName(firstName);
     }
-    @PostMapping(value = "/student/addStudent")
+
+    @PostMapping("/student/addStudent")
     public ResponseEntity<String> addStudent(@RequestBody StudentDto studentDto) {
+//        System.out.println("Received student data: " + studentDto);
         String result = studentService.addStudent(studentDto);
         if ("Success".equals(result)) {
             return new ResponseEntity<>(result, HttpStatus.CREATED);
@@ -47,5 +42,15 @@ public class StudentController {
         }
     }
 
+    @PutMapping("/student/updateStudent/{id}")
+    public ResponseEntity<String> updateStudent(@PathVariable Long id, @RequestBody StudentDto studentDto) {
+        studentService.updateStudent(id, studentDto);
+        return ResponseEntity.ok("Student updated successfully");
+    }
 
+    @DeleteMapping("/student/deleteStudent/{id}")
+    public ResponseEntity<String> deleteStudent(@PathVariable Long id) {
+        studentService.deleteStudent(id);
+        return ResponseEntity.ok("Student deleted successfully");
+    }
 }

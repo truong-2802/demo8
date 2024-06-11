@@ -9,5 +9,6 @@ public interface StudentService {
     List<StudentDto> findAll();
     List<StudentDto> getByFirstName(String firstName);
     String addStudent(StudentDto studentDto);
+    void updateStudent(Long id, StudentDto studentDto);
+    String deleteStudent(Long id);
 }
-

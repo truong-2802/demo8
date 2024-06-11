@@ -76,13 +76,13 @@ public class Student {
                 '}';
     }
 
-    public String getFirstName() {
-        return "Student{" +
-                "id=" + id +
-                ", firstName='" + first_name + '\'' +
-                ", lastName='" + last_name + '\'' +
-                ", address='" + address + '\'' +
-                ", age=" + age +
-                '}';
-    }
+//    public String getFirstName() {
+//        return "Student{" +
+//                "id=" + id +
+//                ", firstName='" + first_name + '\'' +
+//                ", lastName='" + last_name + '\'' +
+//                ", address='" + address + '\'' +
+//                ", age=" + age +
+//                '}';
+//    }
 }

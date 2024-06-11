@@ -1,33 +1,46 @@
 package com.example.demo5.util;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
-
+import java.sql.SQLException;
 
 public class DatabaseHelper {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/student";
     private static final String DRIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "admin@123";
+
     private static Connection connection;
+
     public static synchronized Connection getConnection() {
         if (connection == null) {
             init();
         }
         return connection;
     }
-    public static void init() {
-        Connection newConnection = null;
-        try{
+
+    private static void init() {
+        try {
             Class.forName(DRIVER_CLASS_NAME);
-            newConnection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-            if (newConnection != null) {
-                System.out.println("Connection successfully !");
-            }else {
-                System.err.println("Connection fail !");
-            }
-        }catch (Exception ex) {
-            System.out.println("Exception: " + ex.getMessage());
+            connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+            System.out.println("Connection successfully established!");
+        } catch (ClassNotFoundException e) {
+            System.err.println("Database driver not found: " + e.getMessage());
+            throw new RuntimeException("Database driver not found.", e);
+        } catch (SQLException e) {
+            System.err.println("Failed to connect to database: " + e.getMessage());
+            throw new RuntimeException("Failed to connect to database.", e);
         }
-        connection = newConnection;
+    }
+
+    public static void closeConnection() {
+        if (connection != null) {
+            try {
+                connection.close();
+                System.out.println("Connection closed!");
+            } catch (SQLException e) {
+                System.err.println("Failed to close connection: " + e.getMessage());
+            }
+        }
     }
 }

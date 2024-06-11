@@ -9,39 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class StudentRepositoryReflect  extends JpaExecutorImpl<Student> {
+public class StudentRepositoryReflect extends JpaExecutorImpl<Student> {
     public StudentRepositoryReflect(Class<Student> clazz) {
         super(clazz);
     }
 
-
     public static void main(String[] args) {
-        StudentRepositoryReflect repo = new StudentRepositoryReflect(Student.class) {
-            @Override
-            public Optional<Student> findById(Long id) {
-                return Optional.empty();
-            }
-            public Optional<Student> findByFirstName(String first_name) {
-                return Optional.empty();
-            }
-
-        };
-        repo.findAll();
-
-    }
-    @Override
-    public List<Student> findAll() {
-        List<Student> students = new ArrayList<>();
-        return students;
-    }
-
-    @Override
-    public Optional<Student> findById(Long id) {
-        return Optional.empty();
-    }
-    @Override
-    public Optional<Student> findByFirstName(String first_name) {
-        return Optional.empty();
+        StudentRepositoryReflect repo = new StudentRepositoryReflect(Student.class);
+        List<Student> allStudents = repo.findAll();
+        System.out.println("All Students: " + allStudents);
     }
 
     @Override
@@ -63,6 +39,8 @@ public class StudentRepositoryReflect  extends JpaExecutorImpl<Student> {
         return students;
     }
 
-
-
+    @Override
+    public Optional<Student> findById(Long id) {
+        return Optional.empty();
+    }
 }

@@ -2,6 +2,7 @@ package com.example.demo5.util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,11 +12,10 @@ public class ConnectionPool {
     private static final int POOL_SIZE = 10;
 
     // db config
-    // config value ->
     private static final String DB_URL = "jdbc:mysql://localhost:3306/student";
     private static final String DRIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
     private static final String USER = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "admin@123";
 
     public static synchronized ConnectionPool getInstance() {
         if (instance == null) {
@@ -23,25 +23,34 @@ public class ConnectionPool {
         }
         return instance;
     }
+
+    private ConnectionPool() {
+        connections = new ArrayList<>();
+        for (int i = 0; i < POOL_SIZE; i++) {
+            try {
+                Class.forName(DRIVER_CLASS_NAME);
+                Connection newConnection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
+                connections.add(newConnection);
+            } catch (ClassNotFoundException | SQLException ex) {
+                System.err.println("Exception occurred while creating connection: " + ex.getMessage());
+            }
+        }
+    }
+
     public synchronized Connection getConnection() {
         if (connections.isEmpty()) {
             return null;
         }
         return connections.remove(connections.size() - 1);
-
     }
-    public ConnectionPool() {
-        connections = new ArrayList<>();
-        for (int i = 0; i < POOL_SIZE; i++) {
-            Connection newConnection = null;
+
+    public void releaseConnection(Connection connection) {
+        if (connection != null) {
             try {
-                Class.forName(DRIVER_CLASS_NAME);
-                newConnection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
-                connections.add(newConnection);
-            }catch (Exception ex) {
-                System.out.println("Exception: " + ex.getMessage()) ;
-            }
+                connection.close();
+            } catch (SQLException e) {
+                System.err.println("Failed to release connection: " + e.getMessage());
             }
         }
     }
-
+}
